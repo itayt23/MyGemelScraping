@@ -8,11 +8,11 @@ PERSON_OUTPUT_COLUMNS = ['שם', 'קופה', 'אפיק', 'מסלול']
 def process_clients(clients):
     results = {}
     output = None
+    print('Begin Scraping...')
     for i in range(clients.shape[0]):
         name, typee, course, fund_name = clients.iloc[i]
         fund = FundScraper(typee, course, fund_name)
         client_df = pandas.DataFrame([[name, typee, course, fund_name]], columns=PERSON_OUTPUT_COLUMNS)
-        print(f'Scraping for {fund.typee[::-1]} | {fund.course[::-1]} | {fund.name[::-1]}')
 
         if fund in results:
             roi_df = results[fund]
@@ -21,18 +21,15 @@ def process_clients(clients):
             results[fund] = roi_df
 
         full_user_output = pandas.concat([client_df, roi_df], axis=1)
-
-        if type(output) == type(None):
-            output = full_user_output
-        else:
-            output = output.append(full_user_output)
+        output = output.append(full_user_output) if type(output) != type(None) else full_user_output 
     
+        print(f'{i+1}/{clients.shape[0]}')
+
     output.index = [i for i in range(len(output.index))]
+    print("Done.")
     return output
 
 def write_output_to_excel(output, output_excel_name):
-    # print(f'Final Table:')
-    # print(output)
     with pandas.ExcelWriter(output_excel_name) as excel_writer:
         output.to_excel(excel_writer)
 

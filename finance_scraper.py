@@ -48,11 +48,11 @@ class FundScraper:
     def get_roi_data(self):
         with self.set_current_page(MAIN_SITE):
             fund_page_link = self.extract_fund_link_page()
-            print(f'fund_page_link: {fund_page_link}')
+            # print(f'fund_page_link: {fund_page_link}')
 
             with self.set_current_page(fund_page_link):
                 fund_name_page_link = self.extract_fund_name_link_page()
-                print(f'fund_name_page_link: {fund_name_page_link}')
+                # print(f'fund_name_page_link: {fund_name_page_link}')
                 
                 with self.set_current_page(fund_name_page_link):
                     return self.extract_fund_data()
