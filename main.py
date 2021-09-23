@@ -28,6 +28,9 @@ def main():
     output_df = pandas.DataFrame(np.array(output_rows), columns=OUTPUT_COLUMNS)
     print(f'Final Table:')
     print(output_df)
+    with pandas.ExcelWriter("Client_results.xlsx") as excel_writer:
+        output_df.to_excel(excel_writer)
+
 
 if __name__ == "__main__":
     main()
