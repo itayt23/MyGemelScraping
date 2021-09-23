@@ -34,7 +34,8 @@ def write_output_to_excel(output, output_excel_name):
         output.to_excel(excel_writer)
 
 def main():
-    clients_dataframe = pandas.read_excel('Clients.xlsx')
+    input_path = input("Drag input file")
+    clients_dataframe = pandas.read_excel(input_path)
     output = process_clients(clients_dataframe)
     write_output_to_excel(output, "Client_results.xlsx")
 

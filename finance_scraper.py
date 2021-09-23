@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 
 MAIN_SITE = "https://www.mygemel.net"
 
-
 class FundScraper:
     def __init__(self, typee, course, name):
         self.typee, self.course, self.name = typee, course, name
