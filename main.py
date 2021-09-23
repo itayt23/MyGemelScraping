@@ -1,41 +1,40 @@
 import pandas
 import numpy as np
 
-OUTPUT_COLUMNS = ['שם', 'מסלול', 'אפיק', 'תשואה חודשית', 'תשואה 12 חודשים', 'תשואה מצטברת', 'דמי ניהול']
+from finance_scraper import FundScraper
 
-def scrape(course, typee):
-    return 1, 2, 3, 4
+PERSON_OUTPUT_COLUMNS = ['שם', 'קופה', 'אפיק', 'מסלול']
 
 def process_clients(clients):
     results = {}
-    output = []
+    output = None
     for i in range(clients.shape[0]):
-        name, course, typee = clients.iloc[i]
-        print(f'Scraping for {name[::-1]} | {course[::-1]} | {typee[::-1]}')
+        name, typee, course, fund_name = clients.iloc[i]
+        fund = FundScraper(typee, course, fund_name)
+        client_df = pandas.DataFrame([[name, typee, course, fund_name]], columns=PERSON_OUTPUT_COLUMNS)
+        print(f'Scraping for {fund.typee[::-1]} | {fund.course[::-1]} | {fund.name[::-1]}')
 
-        if (course, typee) in results:
-            monthly_return, ytd_return, accumulated_return, fees = results[(course, typee)]
+        if fund in results:
+            roi_df = results[fund]
         else:
-            monthly_return, ytd_return, accumulated_return, fees = scrape(course, typee)
-            results[(course, typee)] = monthly_return, ytd_return, accumulated_return, fees
+            roi_df = fund.get_roi_data()
+            results[fund] = roi_df
 
-        print(f'Results')
-        print(f'monthly_return: {monthly_return}')
-        print(f'ytd_return: {ytd_return}')
-        print(f'accumulated_return: {accumulated_return}')
-        print(f'fees: {fees}')
-        print()
+        full_user_output = pandas.concat([client_df, roi_df], axis=1)
 
-        output.append([name, course, typee, monthly_return,\
-            ytd_return, accumulated_return, fees])
+        if type(output) == type(None):
+            output = full_user_output
+        else:
+            output = output.append(full_user_output)
+    
+    output.index = [i for i in range(len(output.index))]
     return output
 
 def write_output_to_excel(output, output_excel_name):
-    output_dataframe = pandas.DataFrame(np.array(output), columns=OUTPUT_COLUMNS)
-    print(f'Final Table:')
-    print(output_dataframe)
+    # print(f'Final Table:')
+    # print(output)
     with pandas.ExcelWriter(output_excel_name) as excel_writer:
-        output_dataframe.to_excel(excel_writer)
+        output.to_excel(excel_writer)
 
 def main():
     clients_dataframe = pandas.read_excel('Clients.xlsx')

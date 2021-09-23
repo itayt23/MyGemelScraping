@@ -1,2 +1,6 @@
 Clients.xlsx
 Client_results.xlsx
+~$Client_results.xlsx
+.gitignore
+~$Clients.xlsx
+__pycache__/finance_scraper.cpython-39.pyc
