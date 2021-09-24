@@ -17,7 +17,11 @@ def process_clients(clients):
         if fund in results:
             roi_df = results[fund]
         else:
-            roi_df = fund.get_roi_data()
+            try:
+                roi_df = fund.get_roi_data()
+            except RuntimeError:
+                print(f'Error in Client: {name}, Skipped.')
+                continue
             results[fund] = roi_df
 
         full_user_output = pandas.concat([client_df, roi_df], axis=1)

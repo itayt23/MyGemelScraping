@@ -19,7 +19,7 @@ class FundScraper:
             yield
 
         except requests.exceptions.MissingSchema as e:
-            print(f'Error: No Page Found. Error: {e}')
+            print(f'Error: No Page Found.')
         finally:
             self.current_page = self.previous_pages.pop()
 
@@ -27,7 +27,7 @@ class FundScraper:
         for title in self.current_page.find_all("div", {"class": "koteret"}):
             if self.typee in title.h2.text:
                 return title.a.get('href')
-            
+
     def extract_fund_name_link_page(self):
         for fund_course in self.current_page.find_all("caption"):
             if self.course in fund_course.h2.text:
@@ -36,8 +36,7 @@ class FundScraper:
                         return "/".join([MAIN_SITE, table_entry.td.a.get('href')])
 
     def extract_fund_data(self):
-        output = []
-        columns = []
+        output, columns = [], []
         for entry in self.current_page.find(text='תשואות:').find_next('ul').find_all('li'):
             columns.append(entry.text.split(":")[0])
             output.append(entry.text.split(":")[1])
@@ -47,11 +46,9 @@ class FundScraper:
     def get_roi_data(self):
         with self.set_current_page(MAIN_SITE):
             fund_page_link = self.extract_fund_link_page()
-            # print(f'fund_page_link: {fund_page_link}')
 
             with self.set_current_page(fund_page_link):
                 fund_name_page_link = self.extract_fund_name_link_page()
-                # print(f'fund_name_page_link: {fund_name_page_link}')
                 
                 with self.set_current_page(fund_name_page_link):
                     return self.extract_fund_data()
