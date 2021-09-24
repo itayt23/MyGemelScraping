@@ -5,28 +5,30 @@ from finance_scraper import FundScraper
 
 PERSON_OUTPUT_COLUMNS = ['שם', 'קופה', 'אפיק', 'מסלול']
 
+def process_client(name, typee, course, fund_name):
+    fund = FundScraper(typee, course, fund_name)
+    client_df = pandas.DataFrame([[name, typee, course, fund_name]], columns=PERSON_OUTPUT_COLUMNS)
+    if fund in results:
+        roi_df = results[fund]
+    else:
+        roi_df = fund.get_roi_data()
+        results[fund] = roi_df
+
+    return pandas.concat([client_df, roi_df], axis=1)
+
 def process_clients(clients):
     results = {}
     output = None
     print('Begin Scraping...')
     for i in range(clients.shape[0]):
         name, typee, course, fund_name = clients.iloc[i]
-        fund = FundScraper(typee, course, fund_name)
-        client_df = pandas.DataFrame([[name, typee, course, fund_name]], columns=PERSON_OUTPUT_COLUMNS)
-
-        if fund in results:
-            roi_df = results[fund]
-        else:
-            try:
-                roi_df = fund.get_roi_data()
-            except RuntimeError:
-                print(f'Error in Client: {name}, Skipped.')
-                continue
-            results[fund] = roi_df
-
-        full_user_output = pandas.concat([client_df, roi_df], axis=1)
-        output = output.append(full_user_output) if type(output) != type(None) else full_user_output 
-    
+        try:
+            user_output = process_client(name, typee, course, fund_name)
+        except RuntimeError:
+            print(f'Error in Client: {name}, Skipped.')
+            continue
+        
+        output = output.append(user_output) if type(output) != type(None) else user_output 
         print(f'{i+1}/{clients.shape[0]}')
 
     output.index = [i for i in range(len(output.index))]
