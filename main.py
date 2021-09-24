@@ -6,6 +6,7 @@ from finance_scraper import FundScraper
 PERSON_OUTPUT_COLUMNS = ['שם', 'קופה', 'אפיק', 'מסלול']
 
 def process_client(name, typee, course, fund_name):
+    results = {}
     fund = FundScraper(typee, course, fund_name)
     client_df = pandas.DataFrame([[name, typee, course, fund_name]], columns=PERSON_OUTPUT_COLUMNS)
     if fund in results:
@@ -17,7 +18,6 @@ def process_client(name, typee, course, fund_name):
     return pandas.concat([client_df, roi_df], axis=1)
 
 def process_clients(clients):
-    results = {}
     output = None
     print('Begin Scraping...')
     for i in range(clients.shape[0]):
@@ -40,8 +40,9 @@ def write_output_to_excel(output, output_excel_name):
         output.to_excel(excel_writer)
 
 def main():
-    input_path = input("Drag input file")
-    clients_dataframe = pandas.read_excel(input_path)
+    #input_path = input("Drag input file")
+    #clients_dataframe = pandas.read_excel(input_path)
+    clients_dataframe = pandas.read_excel('Clients.xlsx')
     output = process_clients(clients_dataframe)
     write_output_to_excel(output, "Client_results.xlsx")
 
